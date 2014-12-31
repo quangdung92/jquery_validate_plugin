@@ -1,0 +1,178 @@
+<script>
+	function contains(elem, array) {
+		for (var i = 0; i < array.length; i++) {
+			if (array[i] === elem) {
+				return false;
+			}
+		}
+		return true;
+	}
+	jQuery.validator.addMethod("CheckUser", function() {
+		var names = $(".divname").map(function() {
+			return $.trim($(this).text());
+		}).get();
+		var name = $("#username").val();
+		return contains(name, names);
+	});
+	jQuery.validator.addMethod("Checkmail", function() {
+		var mails = $(".divmail").map(function() {
+			return $.trim($(this).text());
+		}).get();
+		var email = $("#email").val();
+		return contains(email, mails);
+	});
+	jQuery.validator.addMethod("Checkphone", function() {
+		var phones = $(".divphone").map(function() {
+			return $.trim($(this).text());
+		}).get();
+		var phonenumber = $("#phonenumber").val();
+		return contains(phonenumber, phones);
+	});
+	jQuery.validator.addMethod("Checkavailable", function() {
+		var mails = $(".divmail").map(function() {
+			return $.trim($(this).text());
+		}).get();
+		var email = $("#email").val();
+		var phones = $(".divphone").map(function() {
+			return $.trim($(this).text());
+		}).get();
+		var phonenumber = $("#phonenumber").val();
+		if(contains(phonenumber, phones) == false && contains(email, mails) == false){
+			return false;
+		} else {
+			return true;
+		}
+	});
+
+	$(document).ready(function() {
+		$("#check").validate({
+			success : function(label) {
+				label.addClass("alert-box info radius").text("Ok!");
+			},
+			submitHandler : function(form) {
+				form.submit();
+				$("#valid").html("Congratulations! your account has been create").css("font-size", "0.8em");
+				$("#valid").css("color", "#61ef80");
+				$("#hideMsg").css("display", "block");
+				var sec = $("#hideMsg span").text();
+				timer = setInterval(function() {
+					$('#hideMsg span').text(--sec);
+					if (sec == 0) {
+						$('#hideMsg').fadeOut('fast');
+						clearInterval(timer);
+					}
+				}, 1000);
+			},
+			rules : {
+				"username" : {
+					required : true,
+					minlength : 3,
+					CheckUser : true
+				},
+				"email" : {
+					required : {
+						depends : function(element) {
+							return ($('#phonenumber').val() == '');
+						}
+					},
+					email : true,
+					Checkmail : {
+						depends : function(element) {
+							return ($('#phonenumber').val() == '');
+						}
+					},
+					Checkavailable : true
+				},
+				"password" : {
+					required : true,
+					minlength : 3
+				},
+				"phonenumber" : {
+					required : {
+						depends : function(element) {
+							return ($('#email').val() == '');
+						}
+					},
+					minlength : 3,
+					number : true,
+					Checkphone : {
+						depends : function(element) {
+							return ($('#email').val() == '');
+						}
+					},
+					Checkavailable : true
+				}
+			},
+			messages : {
+				"username" : {
+					required : "Required",
+					minlength : "Min Length is 3 characters",
+					CheckUser : "Name already taken"
+				},
+				"email" : {
+					required : "email or phone number not null!",
+					email : "A valid email address is required",
+					Checkmail : "Make sure you have phone number",
+					Checkavailable : "Email or phonenumber has been taken!"
+				},
+				"password" : {
+					required : "Required",
+					minlength : "Min Length is 3 characters"
+				},
+				"phonenumber" : {
+					required : "email or phone number not null!",
+					minlength : "Min Length is 3 characters",
+					number : "phone must be number!",
+					Checkphone : "Make sure you have email",
+					Checkavailable : "Email or phonenumber has been taken!"
+				}
+			},
+			errorPlacement : function(label, element) {
+				label.removeClass("alert-box info radius");
+				label.addClass('alert-box alert');
+				label.insertAfter(element);
+			},
+		});
+	});
+
+</script>
+<div class="medium-8 medium-centered row" align="center" style="margin-top: 50px">
+	<div class="medium-10 medium-centered columns" style="padding: 0px">
+		<h2 style="display: inline-block"><i class="step fi-social-twitter size-60" id="valid" style="color: #82C0FF">&nbspSign up</i></h2>
+		<div id="hideMsg" style="display: none">
+			Redirect in <span>5</span> seconds
+		</div>
+	</div>
+</div>
+<div class="medium-4 medium-centered row" align="center">
+	<div class="medium-10 medium-centered columns">
+		<%= form_tag(create_path, :id => "check") do %>
+		Username
+		<br />
+		<%= text_field_tag(:username)%><label id="validuser" style="display: none"></label>
+		Password
+		<%= password_field_tag(:password)%><label id="validpass" style="display: none"></label>
+		Email
+		<%= text_field_tag(:email)%><label id="validmail" style="display: none,inline"></label>
+		Phonenumber
+		<%= text_field_tag(:phonenumber)%><label id="validphone" style="display: none,inline"></label>
+		<%= submit_tag("Sign",
+		class: "button [tiny small large]", :id => "button")%>
+		<%end%>
+	</div>
+</div>
+<% @usernames.each do |t| %>
+<div class="divname" style="display: none">
+	<%= t.username %>
+</div>
+<%end%>
+<% @phones.each do |t| %>
+<div class="divphone" style="display: none">
+	<%= t.phonenumber %>
+</div>
+<%end%>
+<% @emails.each do |t| %>
+<div class="divmail" style="display: none">
+	<%= t.email %>
+</div>
+<%end%>
