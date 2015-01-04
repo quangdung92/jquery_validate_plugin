@@ -1,3 +1,22 @@
+<style>
+	.errorclass {
+		font-family: "Comic Sans MS", cursive, sans-serif;
+		margin-bottom: 13px;
+		margin-top: 5px;
+		font-size: 1em;
+		font-weight: bold;
+		opacity: 0.4;
+	}
+	.inputBox {
+		border-radius: 5px 5px;
+		height: 10px;
+	}
+	body {
+		background-image: url('/assets/bg.jpg');
+		background-repeat: no-repeat;
+		background-color: #C0DEED;
+	};
+</style>
 <script>
 	function contains(elem, array) {
 		for (var i = 0; i < array.length; i++) {
@@ -7,6 +26,8 @@
 		}
 		return true;
 	}
+
+
 	jQuery.validator.addMethod("CheckUser", function() {
 		var names = $(".divname").map(function() {
 			return $.trim($(this).text());
@@ -37,7 +58,7 @@
 			return $.trim($(this).text());
 		}).get();
 		var phonenumber = $("#phonenumber").val();
-		if(contains(phonenumber, phones) == false && contains(email, mails) == false){
+		if (contains(phonenumber, phones) == false && contains(email, mails) == false) {
 			return false;
 		} else {
 			return true;
@@ -46,9 +67,22 @@
 
 	$(document).ready(function() {
 		$("#check").validate({
-			success : function(label) {
-				label.addClass("alert-box info radius").text("Ok!");
+			success : function(label, element) {
+				label.removeClass("errorclass")
+				label.text('OK!').css({
+				"color" : "blue",
+				"margin-bottom" : "13px",
+				"margin-top" : "5px",
+				"font-family" : "Comic Sans MS, cursive, sans-serif",
+				"font-weight" : "bold",
+				"opacity" : "0.4",
+				});
+				$(element).css({
+					"border-color" : "",
+					"background-color" : ""
+				});
 			},
+
 			submitHandler : function(form) {
 				form.submit();
 				$("#valid").html("Congratulations! your account has been create").css("font-size", "0.8em");
@@ -128,34 +162,36 @@
 				}
 			},
 			errorPlacement : function(label, element) {
-				label.removeClass("alert-box info radius");
-				label.addClass('alert-box alert');
-				label.insertAfter(element);
+				element.css({
+					"border-color" : "#f7f7f7",
+					"background-color" : "#fbe1e1",
+					"opacity" : "0.6"
+				});
+				element.after(label);
+				label.addClass("errorclass");
 			},
 		});
 	});
 
 </script>
-<div class="medium-8 medium-centered row" align="center" style="margin-top: 50px">
-	<div class="medium-10 medium-centered columns" style="padding: 0px">
-		<h2 style="display: inline-block"><i class="step fi-social-twitter size-60" id="valid" style="color: #82C0FF">&nbspSign up</i></h2>
+<div class="medium-4 medium-centered row" align="center" style="margin-top: 50px; background-color: white; padding: 0px; border-radius: 8px 8px">
+	<div class="medium-12 medium-centered columns" id="Sign" style="margin: 0px">
+		<h2 style="display: inline-block"><i class="step fi-social-twitter size-60" id="valid" style="color: #b5daff">&nbspSign up</i></h2>
 		<div id="hideMsg" style="display: none">
 			Redirect in <span>5</span> seconds
 		</div>
 	</div>
-</div>
-<div class="medium-4 medium-centered row" align="center">
-	<div class="medium-10 medium-centered columns">
+	<div class="medium-8 medium-centered columns" style="margin: 0px">
 		<%= form_tag(create_path, :id => "check") do %>
 		Username
 		<br />
-		<%= text_field_tag(:username)%><label id="validuser" style="display: none"></label>
+		<%= text_field_tag 'username', nil, :class => 'inputBox'%>
 		Password
-		<%= password_field_tag(:password)%><label id="validpass" style="display: none"></label>
+		<%= password_field_tag 'password', nil, :class => 'inputBox'%>
 		Email
-		<%= text_field_tag(:email)%><label id="validmail" style="display: none,inline"></label>
+		<%= text_field_tag 'email', nil, :class => 'inputBox'%>
 		Phonenumber
-		<%= text_field_tag(:phonenumber)%><label id="validphone" style="display: none,inline"></label>
+		<%= text_field_tag 'phonenumber', nil, :class => 'inputBox'%>
 		<%= submit_tag("Sign",
 		class: "button [tiny small large]", :id => "button")%>
 		<%end%>
